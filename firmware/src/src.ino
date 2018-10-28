@@ -113,6 +113,8 @@ const byte pulse_count_pin=3;                                        // INT 1 / 
 #define ONE_WIRE_BUS       17
 const byte DHT22_PWR=       6;                                      // Not used in emonTH V2.0, 10K resistor R1 connects DHT22 pins
 const byte DHT22_DATA=      16;                                     // Not used in emonTH V2.0, 10K resistor R1 connects DHT22 pins.
+#define TEMP_SCALE 1
+#define HUMIDITY_SCALE 0.1
 
 OneWire oneWire(ONE_WIRE_BUS);
 DallasTemperature sensors(&oneWire);
@@ -250,6 +252,7 @@ void setup() {
     int deviceid = SI7021_sensor.getDeviceId();
     if (deviceid!=0) {
       SI7021_status=1;
+      SI7021_sensor.setPrecision(0);
       if (debug){
         si7021_env data = SI7021_sensor.getHumidityAndTemperature();
         Serial.print("SI7021 Started, ID: ");
@@ -401,8 +404,8 @@ void loop()
     if (SI7021_status==1){
       power_twi_enable();
       si7021_env data = SI7021_sensor.getHumidityAndTemperature();
-      emonth.temp = (data.celsiusHundredths*0.1);
-      emonth.humidity = (data.humidityBasisPoints*0.1);
+      emonth.temp = (data.celsiusHundredths*TEMP_SCALE);
+      emonth.humidity = (data.humidityBasisPoints*HUMIDITY_SCALE);
       power_twi_disable();
     }
 
